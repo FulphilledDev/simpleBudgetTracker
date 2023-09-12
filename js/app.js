@@ -24,12 +24,14 @@ class BudgetTracker {
   addIncome(income) {
     this._income.push(income);
     this._totalAmount += income.amount;
+    this._displayNewIncome(income);
     this._render();
   }
 
   addExpense(expense) {
     this._expenses.push(expense);
     this._totalAmount -= expense.amount;
+    this._displayNewExpense(expense);
     this._render();
   }
 
@@ -113,6 +115,54 @@ class BudgetTracker {
     const width = Math.min(percentage, 100);
 
     progressEl.style.width = `${width}%`;
+  }
+
+  _displayNewIncome(income) {
+    const incomesEl = document.getElementById('income-items');
+    const incomeEl = document.createElement('div');
+    incomeEl.classList.add('card', 'my-2');
+    incomeEl.setAttribute('data-id', income.id);
+    incomeEl.innerHTML = `
+    <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between">
+      <h4 class="mx-1">${income.name}</h4>
+      <div
+        class="fs-1 bg-primary text-white text-center rounded-2 px-2 px-sm-5"
+      >
+        ${income.amount}
+      </div>
+      <button class="delete btn btn-danger btn-sm mx-2">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+    `;
+
+    incomesEl.appendChild(incomeEl);
+  }
+
+  _displayNewExpense(expense) {
+    const expensesEl = document.getElementById('expense-items');
+    const expenseEl = document.createElement('div');
+    expenseEl.classList.add('card', 'my-2');
+    expenseEl.setAttribute('data-id', expense.id);
+    expenseEl.innerHTML = `
+    <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between">
+      <h4 class="mx-1">${expense.name}</h4>
+      <div
+        class="fs-1 bg-secondary text-white text-center rounded-2 px-2 px-sm-5"
+      >
+        ${expense.amount}
+      </div>
+      <button class="delete btn btn-danger btn-sm mx-2">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+    `;
+
+    expensesEl.appendChild(expenseEl);
   }
 
   _render() {
