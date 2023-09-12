@@ -2,7 +2,8 @@
 // 2. Add event listeners with render DOM methods
 
 // NOTES:
-// In Vanilla JS you have to cause the DOM to 'render' each time we update the DOM (ie addIncome, addExpense)
+// In Vanilla JS you have to cause the DOM to 'render' each time we update the DOM (ie addIncome, addExpense), therefore...
+// We need to make a 'render' private method of the class to call each render method AND call each of those render methods in the constructor
 
 class BudgetTracker {
   constructor() {
@@ -16,6 +17,7 @@ class BudgetTracker {
     this._displayBudgetIncome();
     this._displayBudgetExpenses();
     this._displayBudgetRemaining();
+    this._displayBudgetProgress();
   }
 
   // Publice Methods/API
@@ -66,10 +68,42 @@ class BudgetTracker {
 
   _displayBudgetRemaining() {
     const budgetRemainingEl = document.getElementById('budget-remaining');
+    const progressEl = document.getElementById('budget-progress');
+    const expenses = this._expenses.reduce(
+      (total, expense) => total + expense.amount,
+      0
+    );
 
-    const remaining = this._budgetLimit - this._totalAmount;
+    const remaining = this._budgetLimit - expenses;
 
     budgetRemainingEl.innerHTML = remaining;
+
+    if (remaining < 0) {
+      budgetRemainingEl.parentElement.parentElement.classList.remove(
+        'bg-light'
+      );
+      budgetRemainingEl.parentElement.parentElement.classList.add('bg-danger');
+
+      progressEl.classList.remove('bg-success');
+      progressEl.classList.add('bg-danger');
+    } else {
+      budgetRemainingEl.parentElement.parentElement.classList.remove(
+        'bg-danger'
+      );
+      budgetRemainingEl.parentElement.parentElement.classList.add('bg-light');
+
+      progressEl.classList.remove('bg-danger');
+      progressEl.classList.add('bg-success');
+    }
+  }
+
+  _displayBudgetProgress() {
+    const progressEl = document.getElementById('budget-progress');
+    const percentage = (this._totalAmount / this._budgetLimit) * 100;
+
+    const width = Math.min(percentage, 100);
+
+    progressEl.style.width = `${width}%`;
   }
 
   _render() {
@@ -77,6 +111,7 @@ class BudgetTracker {
     this._displayBudgetIncome();
     this._displayBudgetExpenses();
     this._displayBudgetRemaining();
+    this._displayBudgetProgress();
   }
 }
 
@@ -98,11 +133,15 @@ class Expense {
 
 const budget = new BudgetTracker();
 
-const freelance = new Income('PAC Freelance', 2500);
+const freelance = new Income('PAC Freelance', 1000);
 budget.addIncome(freelance);
+const freelance2 = new Income('The Gathering', 250);
+budget.addIncome(freelance2);
 
-const oilChange = new Expense('Oil Change', 1200);
+const oilChange = new Expense('Oil Change', 80);
 budget.addExpense(oilChange);
+const tireChange = new Expense('New Tires', 500);
+budget.addExpense(tireChange);
 
 console.log(budget._expenses);
 console.log(budget._income);
