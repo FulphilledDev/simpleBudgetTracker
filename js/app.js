@@ -35,8 +35,17 @@ class BudgetTracker {
 
   // Private Methods/API
   _displayBudgetTotal() {
+    const total = this._totalAmount;
     const totalBudgetEl = document.getElementById('budget-total');
     totalBudgetEl.innerHTML = this._totalAmount;
+
+    if (total < 0) {
+      totalBudgetEl.parentElement.parentElement.classList.remove('bg-primary');
+      totalBudgetEl.parentElement.parentElement.classList.add('bg-danger');
+    } else {
+      totalBudgetEl.parentElement.parentElement.classList.remove('bg-danger');
+      totalBudgetEl.parentElement.parentElement.classList.add('bg-primary');
+    }
   }
 
   _displayBudgetLimit() {
@@ -131,18 +140,67 @@ class Expense {
   }
 }
 
-const budget = new BudgetTracker();
+class App {
+  constructor() {
+    this._tracker = new BudgetTracker();
 
-const freelance = new Income('PAC Freelance', 1000);
-budget.addIncome(freelance);
-const freelance2 = new Income('The Gathering', 250);
-budget.addIncome(freelance2);
+    document
+      .getElementById('income-form')
+      .addEventListener('submit', this._newIncome.bind(this));
+    document
+      .getElementById('expense-form')
+      .addEventListener('submit', this._newExpense.bind(this));
+  }
 
-const oilChange = new Expense('Oil Change', 80);
-budget.addExpense(oilChange);
-const tireChange = new Expense('New Tires', 500);
-budget.addExpense(tireChange);
+  _newIncome(e) {
+    e.preventDefault();
 
-console.log(budget._expenses);
-console.log(budget._income);
-console.log(budget._totalAmount);
+    const name = document.getElementById('income-name');
+    const amount = document.getElementById('income-amount');
+
+    // Validate inputs
+    if (name.value === '' || amount.value === '') {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const income = new Income(name.value, +amount.value);
+
+    this._tracker.addIncome(income);
+
+    name.value = '';
+    amount.value = '';
+
+    const collapseIncome = document.getElementById('collapse-income');
+    const bsCollapse = new bootstrap.Collapse(collapseIncome, {
+      toggle: true,
+    });
+  }
+
+  _newExpense(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('expense-name');
+    const amount = document.getElementById('expense-amount');
+
+    // Validate inputs
+    if (name.value === '' || amount.value === '') {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const expense = new Expense(name.value, +amount.value);
+
+    this._tracker.addExpense(expense);
+
+    name.value = '';
+    amount.value = '';
+
+    const collapseExpense = document.getElementById('collapse-expense');
+    const bsCollapse = new bootstrap.Collapse(collapseExpense, {
+      toggle: true,
+    });
+  }
+}
+
+const app = new App();
