@@ -35,6 +35,28 @@ class BudgetTracker {
     this._render();
   }
 
+  removeIncome(id) {
+    const index = this._income.findIndex((income) => income.id === id);
+
+    if (index != -1) {
+      const income = this._income[index];
+      this._totalAmount -= income.amount;
+      this._income.splice(index, 1);
+      this._render();
+    }
+  }
+
+  removeExpense(id) {
+    const index = this._expenses.findIndex((expense) => expense.id === id);
+
+    if (index != -1) {
+      const expense = this._expenses[index];
+      this._totalAmount += expense.amount;
+      this._expenses.splice(index, 1);
+      this._render();
+    }
+  }
+
   // Private Methods/API
   _displayBudgetTotal() {
     const total = this._totalAmount;
@@ -200,6 +222,14 @@ class App {
     document
       .getElementById('expense-form')
       .addEventListener('submit', this._newItem.bind(this, 'expense'));
+
+    document
+      .getElementById('income-items')
+      .addEventListener('click', this._removeItem.bind(this, 'income'));
+
+    document
+      .getElementById('expense-items')
+      .addEventListener('click', this._removeItem.bind(this, 'expense'));
   }
 
   _newItem(type, e) {
@@ -229,6 +259,24 @@ class App {
     const bsCollapse = new bootstrap.Collapse(collapseItem, {
       toggle: true,
     });
+  }
+
+  _removeItem(type, e) {
+    if (
+      e.target.classList.contains('delete') ||
+      e.target.classList.contains('fa-xmark')
+    ) {
+      if (confirm('Are you sure?')) {
+        const id = e.target.closest('.card').getAttribute('data-id');
+        console.log(id);
+
+        type === 'income'
+          ? this._tracker.removeIncome(id)
+          : this._tracker.removeExpense(id);
+
+        e.target.closest('.card').remove();
+      }
+    }
   }
 }
 
