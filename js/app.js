@@ -9,8 +9,8 @@ class BudgetTracker {
   constructor() {
     this._budgetLimit = Storage.getBudgetLimit();
     this._totalAmount = Storage.getTotalAmount(0);
-    this._income = [];
-    this._expenses = [];
+    this._income = Storage.getIncome();
+    this._expenses = Storage.getExpenses();
 
     this._displayBudgetLimit();
     this._displayBudgetTotal();
@@ -25,6 +25,7 @@ class BudgetTracker {
     this._income.push(income);
     this._totalAmount += income.amount;
     Storage.updateTotalAmount(this._totalAmount);
+    Storage.saveIncome(income);
     this._displayNewIncome(income);
     this._render();
   }
@@ -33,6 +34,7 @@ class BudgetTracker {
     this._expenses.push(expense);
     this._totalAmount -= expense.amount;
     Storage.updateTotalAmount(this._totalAmount);
+    Storage.saveExpense(expense);
     this._displayNewExpense(expense);
     this._render();
   }
@@ -73,6 +75,11 @@ class BudgetTracker {
     Storage.setBudgetLimit(budgetLimit);
     this._displayBudgetLimit();
     this._render();
+  }
+
+  loadItems() {
+    this._income.forEach((item) => this._displayNewIncome(item));
+    this._expenses.forEach((item) => this._displayNewExpense(item));
   }
 
   // Private Methods/API
@@ -260,12 +267,50 @@ class Storage {
   static updateTotalAmount(amount) {
     localStorage.setItem('totalAmount', amount);
   }
+
+  static getIncome() {
+    let income;
+    if (localStorage.getItem('income') === null) {
+      income = [];
+    } else {
+      income = JSON.parse(localStorage.getItem('income'));
+    }
+
+    return income;
+  }
+
+  static saveIncome(newIncome) {
+    const income = Storage.getIncome();
+    income.push(newIncome);
+    localStorage.setItem('income', JSON.stringify(income));
+  }
+
+  static getExpenses() {
+    let expenses;
+    if (localStorage.getItem('expenses') === null) {
+      expenses = [];
+    } else {
+      expenses = JSON.parse(localStorage.getItem('expenses'));
+    }
+
+    return expenses;
+  }
+
+  static saveExpense(newExpense) {
+    const expenses = Storage.getExpenses();
+    expenses.push(newExpense);
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+  }
 }
 
 class App {
   constructor() {
     this._tracker = new BudgetTracker();
+    this._loadEventListeners();
+    this._tracker.loadItems();
+  }
 
+  _loadEventListeners() {
     document
       .getElementById('income-form')
       .addEventListener('submit', this._newItem.bind(this, 'income'));
