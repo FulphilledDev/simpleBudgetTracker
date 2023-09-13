@@ -57,6 +57,13 @@ class BudgetTracker {
     }
   }
 
+  reset() {
+    this._totalAmount = 0;
+    this._income = [];
+    this._expenses = [];
+    this._render();
+  }
+
   // Private Methods/API
   _displayBudgetTotal() {
     const total = this._totalAmount;
@@ -230,6 +237,18 @@ class App {
     document
       .getElementById('expense-items')
       .addEventListener('click', this._removeItem.bind(this, 'expense'));
+
+    document
+      .getElementById('filter-income')
+      .addEventListener('keyup', this._filterItems.bind(this, 'income'));
+
+    document
+      .getElementById('filter-expenses')
+      .addEventListener('keyup', this._filterItems.bind(this, 'expense'));
+
+    document
+      .getElementById('reset')
+      .addEventListener('click', this._reset.bind(this));
   }
 
   _newItem(type, e) {
@@ -277,6 +296,28 @@ class App {
         e.target.closest('.card').remove();
       }
     }
+  }
+
+  _filterItems(type, e) {
+    const text = e.target.value.toLowerCase();
+    document.querySelectorAll(`#${type}-items .card`).forEach((item) => {
+      const name = item.firstElementChild.firstElementChild.textContent;
+
+      if (name.toLowerCase().indexOf(text) !== -1) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  _reset() {
+    this._tracker.reset();
+
+    document.getElementById('income-items').innerHTML = '';
+    document.getElementById('expense-items').innerHTML = '';
+    document.getElementById('filter-income').value = '';
+    document.getElementById('filter-expenses').value = '';
   }
 }
 
