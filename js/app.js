@@ -8,7 +8,7 @@
 class BudgetTracker {
   constructor() {
     this._budgetLimit = Storage.getBudgetLimit();
-    this._totalAmount = 0;
+    this._totalAmount = Storage.getTotalAmount(0);
     this._income = [];
     this._expenses = [];
 
@@ -24,6 +24,7 @@ class BudgetTracker {
   addIncome(income) {
     this._income.push(income);
     this._totalAmount += income.amount;
+    Storage.updateTotalAmount(this._totalAmount);
     this._displayNewIncome(income);
     this._render();
   }
@@ -31,6 +32,7 @@ class BudgetTracker {
   addExpense(expense) {
     this._expenses.push(expense);
     this._totalAmount -= expense.amount;
+    Storage.updateTotalAmount(this._totalAmount);
     this._displayNewExpense(expense);
     this._render();
   }
@@ -41,6 +43,7 @@ class BudgetTracker {
     if (index != -1) {
       const income = this._income[index];
       this._totalAmount -= income.amount;
+      Storage.updateTotalAmount(this._totalAmount);
       this._income.splice(index, 1);
       this._render();
     }
@@ -52,6 +55,7 @@ class BudgetTracker {
     if (index != -1) {
       const expense = this._expenses[index];
       this._totalAmount += expense.amount;
+      Storage.updateTotalAmount(this._totalAmount);
       this._expenses.splice(index, 1);
       this._render();
     }
@@ -240,6 +244,21 @@ class Storage {
 
   static setBudgetLimit(budgetLimit) {
     localStorage.setItem('budgetLimit', budgetLimit);
+  }
+
+  static getTotalAmount(defaultAmount = 0) {
+    let totalAmount;
+    if (localStorage.getItem('totalAmount') === null) {
+      totalAmount = defaultAmount;
+    } else {
+      totalAmount = +localStorage.getItem('totalAmount');
+    }
+
+    return totalAmount;
+  }
+
+  static updateTotalAmount(amount) {
+    localStorage.setItem('totalAmount', amount);
   }
 }
 
