@@ -47,6 +47,7 @@ class BudgetTracker {
       this._totalAmount -= income.amount;
       Storage.updateTotalAmount(this._totalAmount);
       this._income.splice(index, 1);
+      Storage.removeIncome(id);
       this._render();
     }
   }
@@ -59,6 +60,7 @@ class BudgetTracker {
       this._totalAmount += expense.amount;
       Storage.updateTotalAmount(this._totalAmount);
       this._expenses.splice(index, 1);
+      Storage.removeExpense(id);
       this._render();
     }
   }
@@ -285,6 +287,17 @@ class Storage {
     localStorage.setItem('income', JSON.stringify(income));
   }
 
+  static removeIncome(id) {
+    const incomes = Storage.getIncome();
+    incomes.forEach((income, index) => {
+      if (income.id === id) {
+        incomes.splice(index, 1);
+      }
+    });
+
+    localStorage.setItem('income', JSON.stringify(incomes));
+  }
+
   static getExpenses() {
     let expenses;
     if (localStorage.getItem('expenses') === null) {
@@ -299,6 +312,17 @@ class Storage {
   static saveExpense(newExpense) {
     const expenses = Storage.getExpenses();
     expenses.push(newExpense);
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+  }
+
+  static removeExpense(id) {
+    const expenses = Storage.getExpenses();
+    expenses.forEach((expense, index) => {
+      if (expense.id === id) {
+        expenses.splice(index, 1);
+      }
+    });
+
     localStorage.setItem('expenses', JSON.stringify(expenses));
   }
 }
