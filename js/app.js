@@ -18,6 +18,8 @@ class BudgetTracker {
     this._displayBudgetExpenses();
     this._displayBudgetRemaining();
     this._displayBudgetProgress();
+
+    document.getElementById('limit').value = this._budgetLimit;
   }
 
   // Publice Methods/API
@@ -69,6 +71,7 @@ class BudgetTracker {
     this._totalAmount = 0;
     this._income = [];
     this._expenses = [];
+    Storage.clearAll();
     this._render();
   }
 
@@ -324,6 +327,16 @@ class Storage {
     });
 
     localStorage.setItem('expenses', JSON.stringify(expenses));
+  }
+
+  static clearAll() {
+    // Keeping budgetLimit
+    localStorage.removeItem('totalAmount');
+    localStorage.removeItem('expenses');
+    localStorage.removeItem('income');
+
+    // To clear everything including budgetLimit
+    // localStorage.clear();
   }
 }
 
