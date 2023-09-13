@@ -7,7 +7,7 @@
 
 class BudgetTracker {
   constructor() {
-    this._budgetLimit = 4000;
+    this._budgetLimit = Storage.getBudgetLimit();
     this._totalAmount = 0;
     this._income = [];
     this._expenses = [];
@@ -66,6 +66,7 @@ class BudgetTracker {
 
   setLimit(budgetLimit) {
     this._budgetLimit = budgetLimit;
+    Storage.setBudgetLimit(budgetLimit);
     this._displayBudgetLimit();
     this._render();
   }
@@ -222,6 +223,23 @@ class Expense {
     this.id = Math.random().toString(16).slice(2);
     this.name = name;
     this.amount = amount;
+  }
+}
+
+class Storage {
+  static getBudgetLimit(defaultLimit = 4500) {
+    let budgetLimit;
+    if (localStorage.getItem('budgetLimit') === null) {
+      budgetLimit = defaultLimit;
+    } else {
+      budgetLimit = +localStorage.getItem('budgetLimit');
+    }
+
+    return budgetLimit;
+  }
+
+  static setBudgetLimit(budgetLimit) {
+    localStorage.setItem('budgetLimit', budgetLimit);
   }
 }
 
