@@ -64,6 +64,12 @@ class BudgetTracker {
     this._render();
   }
 
+  setLimit(budgetLimit) {
+    this._budgetLimit = budgetLimit;
+    this._displayBudgetLimit();
+    this._render();
+  }
+
   // Private Methods/API
   _displayBudgetTotal() {
     const total = this._totalAmount;
@@ -249,6 +255,10 @@ class App {
     document
       .getElementById('reset')
       .addEventListener('click', this._reset.bind(this));
+
+    document
+      .getElementById('limit-form')
+      .addEventListener('click', this._setLimit.bind(this));
   }
 
   _newItem(type, e) {
@@ -318,6 +328,24 @@ class App {
     document.getElementById('expense-items').innerHTML = '';
     document.getElementById('filter-income').value = '';
     document.getElementById('filter-expenses').value = '';
+  }
+
+  _setLimit(e) {
+    e.preventDefault();
+
+    const limit = document.getElementById('limit');
+
+    if (limit.value === '') {
+      alert('Please add a limit!');
+      return;
+    }
+
+    this._tracker.setLimit(+limit.value);
+    limit.value = '';
+
+    const modalEl = document.getElementById('limit-modal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
   }
 }
 
